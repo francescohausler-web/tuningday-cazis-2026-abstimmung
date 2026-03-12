@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tuning Day Cazis 2026 – Abstimmung</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0a; --surface: #141414; --border: #2a2a2a;
+    --accent: #e63a2e; --accent2: #ff6b35; --text: #f0f0f0; --muted: #888;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 2rem 1rem;
+    background-image: radial-gradient(ellipse at 20% 50%, rgba(230,58,46,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(255,107,53,0.06) 0%, transparent 50%);
+  }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 4px; color: var(--muted); margin-bottom: 2.5rem; text-transform: uppercase; text-align: center; }
+  .logo span { color: var(--accent); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem 2rem; width: 100%; max-width: 400px; text-align: center; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 2px; line-height: 1; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff 40%, var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; letter-spacing: 1px; text-transform: uppercase; }
+  label { display: block; text-align: left; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+  input[type="number"] { width: 100%; background: var(--bg); border: 2px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; text-align: center; padding: 1rem; letter-spacing: 4px; outline: none; transition: border-color 0.2s; -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type="number"]:focus { border-color: var(--accent); }
+  .btn { width: 100%; margin-top: 1.5rem; padding: 1rem; border: none; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 3px; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--muted); margin-top: 0.75rem; font-size: 1rem; }
+  .btn-secondary:hover { border-color: var(--text); color: var(--text); }
+  .big-number { font-family: 'Bebas Neue', sans-serif; font-size: 6rem; line-height: 1; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .confirm-text { color: var(--muted); margin: 0.5rem 0 1.5rem; font-size: 0.95rem; }
+  .checkmark { font-size: 4rem; margin-bottom: 1rem; animation: pop 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+  @keyframes pop { 0%{transform:scale(0);opacity:0} 70%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1} }
+  .done-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 2px; }
+  .done-sub { color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem; }
+  .voted-for { margin-top: 1rem; font-size: 0.85rem; color: var(--muted); }
+  .voted-for span { color: var(--accent2); font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 2px; }
+  .error { color: var(--accent); font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2em; }
+  .loading-text { color: var(--muted); font-size: 0.9rem; letter-spacing: 2px; animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .footer { margin-top: 2rem; color: var(--border); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="logo">TUNING DAY <span>CAZIS</span> · 2026</div>
+<div class="card">
+  <div id="inputMode">
+    <h1>VOTE</h1>
+    <p class="subtitle">Gib die Teilnehmernummer ein</p>
+    <label for="carNum">Teilnehmernummer</label>
+    <input type="number" id="carNum" placeholder="001" min="1" max="999" />
+    <div class="error" id="errMsg"></div>
+    <button class="btn btn-primary" onclick="goConfirm()">WEITER →</button>
+  </div>
+  <div id="confirmMode" style="display:none">
+    <p class="subtitle">Du stimmst ab für</p>
+    <div class="big-number" id="confirmNum">—</div>
+    <p class="confirm-text">Ist das die richtige Nummer?</p>
+    <button class="btn btn-primary" onclick="submitVote()">✓ JA, ABSTIMMEN</button>
+    <button class="btn btn-secondary" onclick="goBack()">← Zurück</button>
+  </div>
+  <div id="loadingMode" style="display:none">
+    <p class="loading-text">STIMME WIRD GEZÄHLT...</p>
+  </div>
+  <div id="doneMode" style="display:none">
+    <div class="checkmark">🏁</div>
+    <div class="done-title">DANKE!</div>
+    <p class="done-sub">Deine Stimme wurde gezählt.</p>
+    <div class="voted-for">Abgestimmt für Teilnehmer Nr. <span id="votedNum">—</span></div>
+  </div>
+</div>
+<div class="footer">1 Stimme pro Gerät</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB2ZWWNw_WdM9rAu8TBhrm2NPTngBIaxZM",
+    authDomain: "tuningday-cazis-2026.firebaseapp.com",
+    projectId: "tuningday-cazis-2026",
+    storageBucket: "tuningday-cazis-2026.firebasestorage.app",
+    messagingSenderId: "321172730925",
+    appId: "1:321172730925:web:7638b41eea2f6bc28874a4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const STORAGE_KEY = 'tuningday_cazis_voted_2026';
+
+  function show(id) {
+    ['inputMode','confirmMode','loadingMode','doneMode'].forEach(m => {
+      document.getElementById(m).style.display = m === id ? 'block' : 'none';
+    });
+  }
+
+  // Geräte-Fingerprint (funktioniert auch im privaten Modus)
+  function getDeviceId() {
+    const raw = [
+      navigator.userAgent,
+      navigator.language,
+      screen.width + 'x' + screen.height,
+      screen.colorDepth,
+      navigator.hardwareConcurrency || '',
+      navigator.platform || '',
+      Intl.DateTimeFormat().resolvedOptions().timeZone
+    ].join('|');
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+      hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+      hash |= 0;
+    }
+    return 'dev_' + Math.abs(hash).toString(36);
+  }
+
+  const deviceId = getDeviceId();
+
+  // Beim Laden prüfen ob Gerät bereits abgestimmt hat (localStorage + Firebase)
+  async function checkIfVoted() {
+    const local = localStorage.getItem(STORAGE_KEY);
+    if (local) {
+      document.getElementById('votedNum').textContent = String(local).padStart(3,'0');
+      show('doneMode');
+      return;
+    }
+    try {
+      const devSnap = await getDoc(doc(db, 'devices', deviceId));
+      if (devSnap.exists()) {
+        const votedFor = devSnap.data().car;
+        localStorage.setItem(STORAGE_KEY, votedFor);
+        document.getElementById('votedNum').textContent = String(votedFor).padStart(3,'0');
+        show('doneMode');
+      }
+    } catch(e) {}
+  }
+
+  checkIfVoted();
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('auto')) document.getElementById('carNum').value = params.get('auto');
+
+  window.goConfirm = function() {
+    const val = parseInt(document.getElementById('carNum').value);
+    const err = document.getElementById('errMsg');
+    if (!val || val < 1 || val > 999) { err.textContent = 'Bitte eine gültige Nummer eingeben.'; return; }
+    err.textContent = '';
+    document.getElementById('confirmNum').textContent = String(val).padStart(3,'0');
+    show('confirmMode');
+  }
+
+  window.goBack = function() { show('inputMode'); }
+
+  window.submitVote = async function() {
+    const num = document.getElementById('confirmNum').textContent;
+    const carNum = parseInt(num);
+    show('loadingMode');
+    try {
+      // Nochmals prüfen ob Gerät bereits abgestimmt hat
+      const devRef = doc(db, 'devices', deviceId);
+      const devSnap = await getDoc(devRef);
+      if (devSnap.exists()) {
+        const already = devSnap.data().car;
+        localStorage.setItem(STORAGE_KEY, already);
+        document.getElementById('votedNum').textContent = String(already).padStart(3,'0');
+        show('doneMode');
+        return;
+      }
+
+      // Stimme + Gerät gleichzeitig speichern
+      const voteRef = doc(db, 'votes', String(carNum));
+      const voteSnap = await getDoc(voteRef);
+      if (voteSnap.exists()) {
+        await updateDoc(voteRef, { count: increment(1) });
+      } else {
+        await setDoc(voteRef, { car: carNum, count: 1 });
+      }
+      await setDoc(devRef, { car: carNum, votedAt: new Date().toISOString() });
+
+      localStorage.setItem(STORAGE_KEY, carNum);
+      document.getElementById('votedNum').textContent = String(carNum).padStart(3,'0');
+      show('doneMode');
+    } catch(e) {
+      show('confirmMode');
+      document.getElementById('errMsg').textContent = 'Fehler – bitte nochmal versuchen.';
+    }
+  }
+</script>
+</body>
+</html>
