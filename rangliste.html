@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tuning Day Cazis 2026 – Live Rangliste</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap');
+  :root {
+    --bg: #080808; --surface: #111; --border: #222;
+    --accent: #e63a2e; --accent2: #ff6b35;
+    --gold: #ffd700; --silver: #c0c0c0; --bronze: #cd7f32;
+    --text: #f0f0f0; --muted: #666;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Barlow', sans-serif; min-height: 100vh; padding: 2rem;
+    background-image: radial-gradient(ellipse at 10% 0%, rgba(230,58,46,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 100%, rgba(255,107,53,0.08) 0%, transparent 50%);
+  }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .brand { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 6px; }
+  .brand span { color: var(--accent); }
+  .live-badge { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: blink 1.2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .stats-row { display: flex; gap: 1.5rem; margin-bottom: 2rem; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.5rem; flex: 1; }
+  .stat-label { font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+  .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 2px; color: var(--accent2); }
+  .admin-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .admin-bar input[type="number"] { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; padding: 0.5rem 1rem; width: 100px; letter-spacing: 2px; text-align: center; outline: none; -moz-appearance: textfield; }
+  .admin-bar input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .admin-bar input:focus { border-color: var(--accent); }
+  .btn-add { background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: 8px; color: white; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 2px; padding: 0.5rem 1.5rem; cursor: pointer; transition: opacity 0.2s; }
+  .btn-add:hover { opacity: 0.85; }
+  .btn-reset { background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-family: 'Barlow', sans-serif; font-size: 0.85rem; padding: 0.5rem 1rem; cursor: pointer; margin-left: auto; }
+  .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+  .admin-label { font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .list-header { display: grid; grid-template-columns: 60px 80px 1fr 100px 120px; gap: 1rem; padding: 0 1rem 0.75rem; font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); margin-bottom: 0.5rem; }
+  #rangliste { list-style: none; }
+  .car-row { display: grid; grid-template-columns: 60px 80px 1fr 100px 120px; gap: 1rem; align-items: center; padding: 1rem; border-radius: 10px; margin-bottom: 0.4rem; background: var(--surface); border: 1px solid var(--border); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); animation: slideIn 0.4s ease; }
+  @keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+  .car-row.rank-1 { border-color: var(--gold); background: rgba(255,215,0,0.05); }
+  .car-row.rank-2 { border-color: var(--silver); background: rgba(192,192,192,0.04); }
+  .car-row.rank-3 { border-color: var(--bronze); background: rgba(205,127,50,0.04); }
+  .rank { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 1px; }
+  .rank-1 .rank { color: var(--gold); }
+  .rank-2 .rank { color: var(--silver); }
+  .rank-3 .rank { color: var(--bronze); }
+  .car-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 3px; color: var(--text); }
+  .bar-wrap { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .rank-1 .bar-fill { background: linear-gradient(90deg, #b8860b, var(--gold)); }
+  .votes { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 2px; text-align: right; }
+  .percent { color: var(--muted); font-size: 0.85rem; text-align: right; }
+  .empty { text-align: center; color: var(--muted); padding: 4rem; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; }
+  footer { margin-top: 2rem; text-align: center; color: var(--border); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">TUNING DAY <span>CAZIS</span> · 2026</div>
+  <div class="live-badge"><div class="live-dot"></div>Live</div>
+</header>
+
+<div class="stats-row">
+  <div class="stat-box"><div class="stat-label">Gesamtstimmen</div><div class="stat-value" id="totalVotes">0</div></div>
+  <div class="stat-box"><div class="stat-label">Teilnehmer</div><div class="stat-value" id="totalCars">0</div></div>
+  <div class="stat-box"><div class="stat-label">Führend</div><div class="stat-value" id="leadingCar">—</div></div>
+</div>
+
+<div class="admin-bar">
+  <span class="admin-label">Stimme eintragen:</span>
+  <input type="number" id="adminCarNum" placeholder="042" min="1" max="999" />
+  <button class="btn-add" onclick="addVote()">+ STIMME</button>
+  <button class="btn-reset" onclick="resetAll()">🗑 Alles zurücksetzen</button>
+</div>
+
+<div class="list-header">
+  <span>Platz</span><span>Nr.</span><span>Stimmen</span>
+  <span style="text-align:right">Stimmen</span><span style="text-align:right">Anteil</span>
+</div>
+
+<ul id="rangliste">
+  <li class="empty">Warte auf Verbindung...</li>
+</ul>
+
+<footer>Tuning Day Cazis 2026 · Live Auswertung</footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, increment, getDocs, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB2ZWWNw_WdM9rAu8TBhrm2NPTngBIaxZM",
+    authDomain: "tuningday-cazis-2026.firebaseapp.com",
+    projectId: "tuningday-cazis-2026",
+    storageBucket: "tuningday-cazis-2026.firebasestorage.app",
+    messagingSenderId: "321172730925",
+    appId: "1:321172730925:web:7638b41eea2f6bc28874a4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Live listener – aktualisiert sich automatisch bei jeder neuen Stimme
+  onSnapshot(collection(db, 'votes'), (snapshot) => {
+    const votes = [];
+    snapshot.forEach(doc => {
+      votes.push({ car: doc.data().car, count: doc.data().count });
+    });
+    render(votes);
+  });
+
+  function render(votes) {
+    const sorted = votes.sort((a, b) => b.count - a.count);
+    const total = sorted.reduce((s, r) => s + r.count, 0);
+    const max = sorted[0]?.count || 1;
+
+    document.getElementById('totalVotes').textContent = total;
+    document.getElementById('totalCars').textContent = sorted.length;
+    document.getElementById('leadingCar').textContent = sorted[0] ? `#${String(sorted[0].car).padStart(3,'0')}` : '—';
+
+    const ul = document.getElementById('rangliste');
+    if (sorted.length === 0) {
+      ul.innerHTML = '<li class="empty">Noch keine Stimmen – warte auf Abstimmungen…</li>';
+      return;
+    }
+
+    const medals = ['🥇','🥈','🥉'];
+    ul.innerHTML = sorted.map((row, i) => {
+      const rankClass = i < 3 ? `rank-${i+1}` : '';
+      const medal = i < 3 ? `<span>${medals[i]}</span>` : '';
+      const pct = total > 0 ? Math.round(row.count / total * 100) : 0;
+      const barW = Math.round(row.count / max * 100);
+      return `
+        <li class="car-row ${rankClass}">
+          <div class="rank">${medal || `#${i+1}`}</div>
+          <div class="car-num">${String(row.car).padStart(3,'0')}</div>
+          <div><div class="bar-wrap"><div class="bar-fill" style="width:${barW}%"></div></div></div>
+          <div class="votes">${row.count}</div>
+          <div class="percent">${pct}%</div>
+        </li>`;
+    }).join('');
+  }
+
+  window.addVote = async function() {
+    const val = parseInt(document.getElementById('adminCarNum').value);
+    if (!val || val < 1 || val > 999) return;
+    const ref = doc(db, 'votes', String(val));
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      await updateDoc(ref, { count: increment(1) });
+    } else {
+      await setDoc(ref, { car: val, count: 1 });
+    }
+    document.getElementById('adminCarNum').value = '';
+    document.getElementById('adminCarNum').focus();
+  }
+
+  window.resetAll = async function() {
+    if (!confirm('Wirklich alle Stimmen löschen?')) return;
+    const snap = await getDocs(collection(db, 'votes'));
+    snap.forEach(async d => await deleteDoc(doc(db, 'votes', d.id)));
+  }
+
+  document.getElementById('adminCarNum').addEventListener('keydown', e => {
+    if (e.key === 'Enter') window.addVote();
+  });
+</script>
+</body>
+</html>
